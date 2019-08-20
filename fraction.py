@@ -1,29 +1,49 @@
-'''
-  Bosen Qu (20768684)
-  August 18, 2019
-  Fraction class that supports fraction calculations
-'''
+##=======================================================
+## Bosen Qu (20768684)
+## August 20, 2019
+## Fraction class that supports fraction calculations
+##=======================================================
 
 def gcd(a, b):
-    # gcd(a, b) computes the greatest common divisor of a and b
-    # gcd: Int Int -> Int
-        if a % b == 0:
-            return b
-        return gcd(b, a % b)
+    '''
+    returns the greatest common divisor of a and b
+    
+    gcd: Nat Nat -> Nat
+    
+    Examples:
+        gcd(5, 15) => 5
+        gcd(14, 15) => 1
+    '''
+    if a % b == 0:
+        return b
+    return gcd(b, a % b)
    
 def scm(a, b):
-    # scm(a, b) computes the smallest common multiplier of a and b
-    # scm: Int Int -> Int
+    '''
+    returns the smallest common multiplier of a and b
+    
+    scm: Nat Nat -> Nat
+    
+    Examples:
+        scm(4, 6) => 12
+        scm(5, 3) => 15
+    '''
     return a * b // gcd(a, b)
     
 def cast_str(str):
-    # cast_str(str) casts a string str to a fraction
-    # cast_str: Str -> Fraction
-        if '/' in str:
-            nums = list(map(float, str.split('/')))
-            return Fraction(nums[0], nums[1])
-        else:
-            return Fraction(float(str), 1)
+    '''
+    returns str casted as a Fraction
+    
+    cast_str: Str -> Fraction
+    
+    Examples:
+        if the user inputs “5/6”
+    '''
+    if '/' in str:
+        nums = list(map(float, str.split('/')))
+        return Fraction(nums[0], nums[1])
+    else:
+        return Fraction(float(str), 1)
 
 class Fraction:
     def __init__(self, nume, deno = 1, neg = False):
@@ -122,7 +142,7 @@ class Fraction:
             other = Fraction(other)
         return Fraction(self.nume * other.nume, self.deno * other.deno, not self.neg == other.neg)
 
-    __rmul___ = __mul__
+    __rmul__ = __mul__
     
     def recip(self):
         return Fraction(self.deno, self.nume, self.neg)
