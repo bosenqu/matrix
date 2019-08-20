@@ -8,12 +8,14 @@ def empty_val(row, col):
                 lst[i].append("undefined")
         return lst
     
-def is_zero_row(row):
+def leading_one_index(row):
+    rv = 0
     for n in row:
-        if n != 0:
-            return False
-    return True
-
+        if n == 1:
+            break
+        rv += 1
+    return rv
+    
 def std_matrix_val(n):
     lst = empty_val(n, n)
     for i in range(n):
@@ -158,13 +160,13 @@ class Matrix:
         for i in range(n + 1, min(self.col, self.row)):
             self.row_add_mult(n, i, -self.val[n][i])
             
-    def rearrange_zero_rows(self):
-        self.val.sort(key = lambda x: 1 if is_zero_row(x) else 0)
+    def rearrange_leading_one(self):
+        self.val.sort(key = lambda x: leading_one_index(x))
             
     def RREF(self):
         m = self.deep_copy()
         m.row_reduce(0)
-        m.rearrange_zero_rows()
+        m.rearrange_leading_one()
         return m
     
     def rank(self):
@@ -186,14 +188,59 @@ class Matrix:
         aug_self = Aug_Matrix(self.row, self.col, self.row,
                               self.deep_copy(True), std_matrix_val(self.row))
         return Matrix(self.row, self.col, aug_self.RREF().aug)
+    
+    def transpose(self):
+        val = empty_val(self.col, self.row)
+        for i in range(self.row):
+            for j in range(self.col):
+                val[j][i] = self.val[i][j]
+        return Matrix(self.col, self.row, val)
+    
+    def remove_row_col(self, row, col):
+        rv = self.deep_copy()
+        rv.val.pop(row)
+        for row in rv.val:
+            row.pop(col)
+        rv.row -= 1
+        rv.col -= 1
+        return rv
         
+    def det(self):
+        if self.row != self.col:
+            return "undefined"
+        if self.row == 1:
+            return self.val[0][0]
+        if self.row == 2:
+            return self.val[0][0] * self.val[1][1] -\
+                   self.val[0][1] * self.val[1][0]
+        det = fraction.Fraction(0)
+        for i in range(self.col):
+            det += ((-1) ** i) * self.val[0][i] * self.remove_row_col(0, i).det()
+        return det
+    
+    def is_upper_triangular(self):
+        for j in range(self.col):
+            for i in range(j + 1, self.row):
+                if self.val[i][j] != 0:
+                    return False
+        return True
+    
+    def is_lower_triangular(self):
+        for j in range(self.col):
+            for i in range(0, j - 1):
+                if self.val[i][j] != 0:
+                    return False
+        return True
+    
+    def is_triangluar(self):
+        return is_upper_triangular or is_lower_triangular
         
 class Aug_Matrix(Matrix):
-    def __init__(self, row, col, aug_col, val = [], aug = []):
+    def __init__(self, row, col, aug_col, val = [], aug = []):     
         Matrix.__init__(self, row, col, val)
+        self.col += aug_col
         self.aug_col = aug_col
         if aug == []:
-            self.aug = empty_val(self.row, self.aug_col)
             self.input_aug()
             self.print()
         else:
@@ -203,26 +250,21 @@ class Aug_Matrix(Matrix):
         for i in range(self.aug_col):
             for j in range(self.row):
                 print(f"input aug({j + 1}, {i + 1}): ", end = "")
-                self.aug[j][i] = Fraction.cast_str(input())
+                self.val[j].append(fraction.cast_str(input()))
     
     def print(self):
         for i in range(self.row):
-            for num in self.val[i]:
-                print(num, end = " ")
-            print("|", end = " ")
-            for num in self.aug[i]:
-                print(num, end = " ")
+            for j in range(self.col):
+                if j == self.col - self.aug_col:
+                    print("|", end = " ")
+                print(self.val[i][j], end = " ")
             print()
                
     def deep_copy(self):
-        new_val = []
-        new_aug = []
-        for i in range(self.row):
-            new_val.append([])
-            new_val[i] = [j for j in self.val[i]]
-            new_aug.append([])
-            new_aug[i] = [j for j in self.aug[i]]
-        return Aug_Matrix(self.row, self.col, self.aug_col, new_val, new_aug)
+        rv = Matrix.deep_copy(self)
+        rv.aug_col = self.aug_col
+        rv.__class__ = Aug_Matrix
+        return rv
     
     def __add__(self, other):
         return "undefined"
@@ -238,22 +280,3 @@ class Aug_Matrix(Matrix):
         
     def __truediv__(self, other):
         return "undefined"
-    
-    def row_mult(self, row_num, mult):
-        Matrix.row_mult(self, row_num, mult)
-        self.aug[row_num] = list(map(lambda x: x * mult, self.aug[row_num]))
-    
-    def row_swap(self, row_num_1, row_num_2):
-        Matrix.row_swap(self, row_num_1, row_num_2)
-        for i in range(self.aug_col):
-            self.aug[row_num_1][i], self.aug[row_num_2][i] =\
-            self.aug[row_num_2][i], self.aug[row_num_1][i]
-    
-    def row_add_mult(self, row_num_1, row_num_2, mult):
-        Matrix.row_add_mult(self, row_num_1, row_num_2, mult)
-        for i in range(self.aug_col):
-            self.aug[row_num_1][i] += self.aug[row_num_2][i] * mult
-    
-        
-m1 = Matrix(3, 3)
-print(m1.invertible())
