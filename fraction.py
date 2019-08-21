@@ -1,14 +1,15 @@
 ##=======================================================
 ## Bosen Qu (20768684)
-## August 20, 2019
+## August 21, 2019
 ## Fraction class that supports fraction calculations
 ##=======================================================
 
 def gcd(a, b):
     '''
-    returns the greatest common divisor of a and b
+    gcd(a, b) returns the greatest common divisor of a and b
     
-    gcd: Nat Nat -> Nat
+    gcd: Nat Nat -> Nat 
+    requires: b != 0
     
     Examples:
         gcd(5, 15) => 5
@@ -20,9 +21,10 @@ def gcd(a, b):
    
 def scm(a, b):
     '''
-    returns the smallest common multiplier of a and b
+    scm(a, b) returns the smallest common multiplier of a and b
     
-    scm: Nat Nat -> Nat
+    scm: Nat Nat -> Nat 
+    requires: b != 0
     
     Examples:
         scm(4, 6) => 12
@@ -32,12 +34,16 @@ def scm(a, b):
     
 def cast_str(str):
     '''
-    returns str casted as a Fraction
+    cast_str(str) returns str casted as Fraction object
     
-    cast_str: Str -> Fraction
+    cast_str: Str -> Fraction 
+    requires: must be a proper fraction
     
     Examples:
-        if the user inputs “5/6”
+        cast_str(“5/6”) => 5/6 stored as Fraction
+        cast_str("-5/6") => -5/6 stored as Fraction
+        cast_str("2/6") => 1/3 stored as Fraction
+        cast_str("3") => 3 stroed as Fraction
     '''
     if '/' in str:
         nums = list(map(float, str.split('/')))
@@ -46,7 +52,18 @@ def cast_str(str):
         return Fraction(float(str), 1)
 
 class Fraction:
+    '''
+    Fields: nume(Int), deno(Nat), neg(Bool)
+    requires: nume >= 0
+    '''
+    
     def __init__(self, nume, deno = 1, neg = False):
+        '''
+        Constructor: Creates a Fraction object by calling fraction(nume, deno, neg)
+        
+        __init__: Int (anyof Int, Float, None) (anyof Int, Float, None) Bool -> None
+        requires: deno != 0
+        '''
         self.nume, self.deno = abs(nume), abs(deno)
         self.neg = neg if nume > 0 and deno > 0 or\
                           nume < 0 and deno < 0\
@@ -54,6 +71,19 @@ class Fraction:
         self.reduce()
     
     def reduce(self):
+        '''
+        reduces self.nume and self.deno to simplist form of fraction
+        
+        reduce: None -> None
+        
+        Examples:
+        if self is Fraction(3, 6, True), then self becomes -1/2 stored as Fraction
+        if self is Fraction(-3, 6), then self becomes -1/2 stored as Fraction
+        if self is Fraction(3, -6), then self becomes -1/2 stored as Fraction
+        if self is Fraction(3, -6, True), then self becomes 1/2 stored as Fraction
+        if self is Fraction(2.5, 3.5), then self becomes 5/7 stored as Fraction
+        if self is Fraction(0.75), then self becomes 3/4 stored as Fraction
+        '''
         while int(self.nume) != self.nume or int(self.deno) != self.deno:
             self.nume = self.nume * 10
             self.deno = self.deno * 10
@@ -64,6 +94,11 @@ class Fraction:
         self.deno = self.deno // n
     
     def __repr__(self):
+        '''
+        returns a string representation of self
+        
+        __repr__: Fraction -> Str
+        '''
         if self.deno == 0:
             return "undenfined"
         if self.nume == 0:
@@ -76,23 +111,28 @@ class Fraction:
             rv += "/" + str(self.deno)
         return rv
     
-    def sum_scalar(self, other, sign):
-        sum_deno = scm(self.deno, other.deno)
-        sum_nume = self.nume * (sum_deno // self.deno) + other.nume * (sum_deno // other.deno)
-        return Fraction(sum_nume, sum_deno, sign)
-    
-    def diff_scalar(self, other, sign):
-        diff_deno = scm(self.deno, other.deno)
-        diff_nume = self.nume * (diff_deno // self.deno) - other.nume * (diff_deno // other.deno)
-        return Fraction(abs(diff_nume), diff_deno, sign)
-    
     def __abs__(self):
+        '''
+        returns the absolute value of self
+        
+        __abs__: Fraction -> Fraction
+        '''
         return Fraction(self.nume, self.deno, False)
     
     def __neg__(self):
+        '''
+        returns the negation of self
+        
+        __neg__: Fraction -> Fraction
+        '''
         return Fraction(self.nume, self.deno, not self.neg)
     
     def __eq__(self, other):
+        '''
+        returns True if self and other are considered equal, False other-wise
+        
+        __eq__: Fraction, Any -> Bool
+        '''
         if type(other) != Fraction:
             other = Fraction(other)
         if self.nume == 0 and other.nume == 0 and self.deno != 0 and other.deno != 0:
@@ -100,6 +140,11 @@ class Fraction:
         return self.neg == other.neg and self.nume == other.nume and self.deno == other.deno
     
     def __lt__(self, other):
+        '''
+        returns True if self is less than other
+        
+        __lt__: Fraction, Any -> Bool
+        '''
         if type(other) != Fraction:
             other = Fraction(other)
         if self == other:
@@ -113,10 +158,47 @@ class Fraction:
             return self.neg == True
     
     def __gt__(self, other):
+        '''
+        returns True if self is greater than other
+        
+        __gt__: Fraction, Any -> Bool
+        '''
         if type(other) != Fraction:
             other = Fraction(other)
         return (not self < other) and (not self == other)
             
+    def sum_scalar(self, other, sign):
+        '''
+        returns a Fraction object whose value is by abs(self) + abs(other),
+          with neg = sign
+        
+        sum_scalar: Fraction Fraction Bool -> Fraction
+        
+        Examples:
+        if a is Fraction(3, 5, True) and b is Fraction(4, 5, True), then
+          a.sum_scalar(b, False) => Fraction(7, 5, False)
+          a.sum_scalar(b, True) => Fraction(7, 5, True)
+        '''
+        sum_deno = scm(self.deno, other.deno)
+        sum_nume = self.nume * (sum_deno // self.deno) + other.nume * (sum_deno // other.deno)
+        return Fraction(sum_nume, sum_deno, sign)
+    
+    def diff_scalar(self, other, sign):
+        '''
+        returns a Fraction object whose value is the absolute value of abs(self) - abs(other),
+          with neg = sign
+          
+        diff_scalar: Fraction Fraction Bool
+        
+        Examples:
+        if a is Fraction(3, 5, True) and b is Fraction(4, 5, True), then
+          a.diff_scalar(b, False) => Fraction(1, 5, False)
+          a.diff_scalar(b, True) => Fraction(1, 5, True)
+        '''
+        diff_deno = scm(self.deno, other.deno)
+        diff_nume = self.nume * (diff_deno // self.deno) - other.nume * (diff_deno // other.deno)
+        return Fraction(abs(diff_nume), diff_deno, sign)
+    
     def __add__(self, other):
         if type(other) != Fraction:
             other = Fraction(other)
