@@ -1,10 +1,10 @@
 # matrix
 Matrix Calculator
 
-Fraction Class:
-  automatically reduces fraction to its simpliest form
-  able to covert a integer or a float number to a fraction
-  supports the following calculations:
+* Fraction Class:
+  * automatically reduces fraction to its simpliest form
+  * able to covert a integer or a float number to a fraction
+  * supports the following calculations:
     addition
     subtraction
     multiplication
