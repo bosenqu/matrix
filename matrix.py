@@ -1,6 +1,21 @@
+##=======================================================
+## Bosen Qu (20768684)
+## August 22, 2019
+## Matrix class that supports Matirx calculations
+##=======================================================
+
 import fraction
 
 def empty_val(row, col):
+    '''
+    returns initialized value for a row * col matrix
+    
+    empty_val: Nat Nat -> (listof (listof "undefined"))
+    
+    Examples:
+        empty_val(2, 3) => [["undefined", "undefined", "undefined"]
+                           ["undefined", "undefined", "undefined"]]
+    '''
         lst = []
         for i in range(row):
             lst.append([])
@@ -9,6 +24,17 @@ def empty_val(row, col):
         return lst
     
 def leading_one_index(row):
+    '''
+    returns the index of leading one in a row, assuming the
+        row is in a RREF matirx, or returns the column size
+        if there is no leading one
+        
+    leading_one_index: (listof (anyof Int Float Fraction)) -> Nat
+    
+    Examples:
+        leading_one_index([0, 1, 2, 3]) => 1
+        leading_one_index([1, 2, 3, 4]) => 4
+    '''
     rv = 0
     for n in row:
         if n == 1:
@@ -17,6 +43,15 @@ def leading_one_index(row):
     return rv
     
 def std_matrix_val(n):
+    '''
+    returns the value of a n * n standard matrix
+    
+    std_matrix_val: Nat -> (listof (listof Fraction))
+    
+    Examples: std_matrix_val(3): [[Fraction(1), Fraction(0), Fraction(0)]
+                                  [Fraction(0), Fraction(1), Fraction(0)]
+                                  [Fraction(0), Fraction(0), Fraction(1)]]
+    '''
     lst = empty_val(n, n)
     for i in range(n):
         for j in range(n):
@@ -25,6 +60,11 @@ def std_matrix_val(n):
     return lst        
 
 class Matrix:
+    '''
+    Fields: row(Nat), col(Nat), val(listof (listof Fraction))
+    Requires: row > 0
+              col > 0
+    '''
     def __init__(self, row, col, val = []):
         self.row = row
         self.col = col
