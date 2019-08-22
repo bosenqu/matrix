@@ -1,6 +1,6 @@
 ##=======================================================
 ## Bosen Qu (20768684)
-## August 21, 2019
+## August 22, 2019
 ## Fraction class that supports fraction calculations
 ##=======================================================
 
@@ -131,7 +131,7 @@ class Fraction:
         '''
         returns True if self and other are considered equal, False other-wise
         
-        __eq__: Fraction, Any -> Bool
+        __eq__: Fraction, (anyof Fraction Int Float) -> Bool
         '''
         if type(other) != Fraction:
             other = Fraction(other)
@@ -143,7 +143,7 @@ class Fraction:
         '''
         returns True if self is less than other
         
-        __lt__: Fraction, Any -> Bool
+        __lt__: Fraction, (anyof Fraction Int Float) -> Bool
         '''
         if type(other) != Fraction:
             other = Fraction(other)
@@ -161,7 +161,7 @@ class Fraction:
         '''
         returns True if self is greater than other
         
-        __gt__: Fraction, Any -> Bool
+        __gt__: Fraction, (anyof Fraction Int Float) -> Bool
         '''
         if type(other) != Fraction:
             other = Fraction(other)
@@ -170,7 +170,7 @@ class Fraction:
     def sum_scalar(self, other, sign):
         '''
         returns a Fraction object whose value is by abs(self) + abs(other),
-          with neg = sign
+            with neg = sign
         
         sum_scalar: Fraction Fraction Bool -> Fraction
         
@@ -186,7 +186,7 @@ class Fraction:
     def diff_scalar(self, other, sign):
         '''
         returns a Fraction object whose value is the absolute value of abs(self) - abs(other),
-          with neg = sign
+            with neg = sign
           
         diff_scalar: Fraction Fraction Bool
         
@@ -200,6 +200,11 @@ class Fraction:
         return Fraction(abs(diff_nume), diff_deno, sign)
     
     def __add__(self, other):
+        '''
+        returns the result of self + other
+        
+        __add__: Fraction (anyof Fraction Int Float) -> Fraction
+        '''
         if type(other) != Fraction:
             other = Fraction(other)
         if self.neg == other.neg:
@@ -207,29 +212,56 @@ class Fraction:
         else:
             return Fraction.diff_scalar(self, other, not self.neg if abs(self) < abs(other) else self.neg)
     
+    # __radd__ follows the same rules as __add__
     __radd__ = __add__
     
     def __sub__(self, other):
+        '''
+        returns the result of self - other
+        
+        __sub__: Fraction (anyof Fraction Int Float) -> Fraction      
+        '''
         if type(other) != Fraction:
             other = Fraction(other)
         return self + (-other)
     
     def __rsub__(self, other):
+        '''
+        returns the result of other - self
+        
+        __rsub__: Fraction (anyof Fraction Int Float) -> Fraction
+        '''
         if type(other) != Fraction:
             other = Fraction(other)
         return other + (-self)
     
     def __mul__(self, other):
+        '''
+        returns the result of self * other
+        
+        __mul__: Fraction (anyof Fraction Int Float) -> Fraction
+        '''
         if type(other) != Fraction:
             other = Fraction(other)
         return Fraction(self.nume * other.nume, self.deno * other.deno, not self.neg == other.neg)
 
+    # __rmul__ follows the same rules as __mul__
     __rmul__ = __mul__
     
     def recip(self):
+        '''
+        returns the reciprocal(multiplicative inverse) of self
+        
+        recip: Fraction -> Fraction
+        '''
         return Fraction(self.deno, self.nume, self.neg)
     
     def __truediv__(self, other):
+        '''
+        returns the reult of self / other
+        
+        __truediv__: Fraction (anyof Fraction Int Float) -> Fraction
+        '''
         if type(other) != Fraction:
             other = Fraction(other)
         return self * other.recip()
