@@ -15,7 +15,7 @@ Matrix Calculator
 * **Matrix Class**:
   * allows user to input a n by m matrix
   * displays numbers as either integer or fraction
-  * supports the following calculations for n * m matrix:
+  * supports the following calculations of a n * m matrix:
     * addition
     * subtraction
     * matrix multiplication
