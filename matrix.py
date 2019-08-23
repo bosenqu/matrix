@@ -1,6 +1,6 @@
 ##=======================================================
 ## Bosen Qu (20768684)
-## August 22, 2019
+## August 23, 2019
 ## Matrix class that supports Matirx calculations
 ##=======================================================
 
@@ -16,12 +16,12 @@ def empty_val(row, col):
         empty_val(2, 3) => [["undefined", "undefined", "undefined"]
                            ["undefined", "undefined", "undefined"]]
     '''
-        lst = []
-        for i in range(row):
-            lst.append([])
-            for j in range(col):
-                lst[i].append("undefined")
-        return lst
+    lst = []
+    for i in range(row):
+        lst.append([])
+        for j in range(col):
+            lst[i].append("undefined")
+    return lst
     
 def leading_one_index(row):
     '''
@@ -62,10 +62,14 @@ def std_matrix_val(n):
 class Matrix:
     '''
     Fields: row(Nat), col(Nat), val(listof (listof Fraction))
-    Requires: row > 0
-              col > 0
     '''
+    
     def __init__(self, row, col, val = []):
+        '''
+        Constructor: Creates a Matrix object by calling Matrix(row, col, val)
+        
+        __init__: Nat Nat (anyof (listof (listof Fraction)) None) -> None
+        ''' 
         self.row = row
         self.col = col
         if val == []:
@@ -76,18 +80,37 @@ class Matrix:
             self.val = val
     
     def input(self):
+        '''
+        coverts user input to the value of matrix
+        
+        input: Matrix -> None
+        
+        Effects: asks user for input
+        '''
         for i in range(self.row):
             for j in range(self.col):
                 print(f"input M({i + 1}, {j + 1}): ", end = "")
                 self.val[i][j] = fraction.cast_str(input())
     
     def print(self):
+        '''
+        prints the matrix
+        
+        print: Matrix -> None
+        
+        Effects: prints out the matrix
+        '''
         for i in range(self.row):
             for num in self.val[i]:
                 print(num, end = " ")
             print()
             
     def deep_copy(self, only_val = False):
+        '''
+        returns a copy of self or only its value
+        
+        deep_copy: Matrix (anyof Bool None) -> (anyof Matrix (listof (listof Fraction))
+        '''
         new_val = []
         for i in range(self.row):
             new_val.append([])
@@ -96,6 +119,13 @@ class Matrix:
         
             
     def __add__(self, other):
+        '''
+        returns the result of self + other
+        
+        __add__: Matrix Matrix -> Matrix
+        requires: self.row == other.row
+                  self.col == other.col
+        '''
         if self.row != other.row or self.col != other.col:
             return "undefined"
         val = empty_val(self.row, self.col)
@@ -103,8 +133,17 @@ class Matrix:
             for j in range(self.col):
                 val[i][j] = self.val[i][j] + other.val[i][j]
         return Matrix(self.row, self.col, val)
+    
+    __radd__ = __add__
         
     def __sub__(self, other):
+        '''
+        returns the result of self - other
+        
+        __sub__: Matrix Matrix -> Matrix
+        requires: self.row == other.row
+                  self.col == other.col
+        '''
         if self.row != other.row or self.col != other.col:
             return "undefined"
         val = empty_val(self.row, self.col)
@@ -114,26 +153,46 @@ class Matrix:
         return Matrix(self.row, self.col, val)
     
     def __mul__(self, other):
+        '''
+        returns the result of self * other
+        
+        __mul__: Matrix (anyof Fraction Int Float) -> Matrix
+        requires: if type(other) == matrix, then self.row == other.col
+        '''
         if type(other) == Matrix:
             if self.col != other.row:
                 return "undefined"
             val = empty_val(self.row, other.col)
             for i in range(self.row):
                 for j in range(other.col):
-                    temp = Fraction(0)
+                    temp = 0
                     for k in range(self.col):
                         temp += self.val[i][k] * other.val[k][j]
                     val[i][j] = temp
             return Matrix(self.row, other.col, val)
         else:
             val = empty_val(self.row, self.col)
-            mult = other if type(other) == Fraction else Fraction.cast_num(other)
+            mult = other if type(other) == fraction.Fraction \
+                   else fraction.Fraction(other)
             for i in range(self.row):
                 for j in range(self.col):
                     val[i][j] = self.val[i][j] * mult
             return Matrix(self.row, self.col, val)
         
+    def __rmul__(self, other):
+        '''
+        returns the result of other * self
+        
+        __rmul__: Matrix (anyof Fraction, Int, Float) -> Matrix
+        '''
+        return self * other
+    
     def is_non_zero_row(self, row):
+        '''
+        returns True if self.val[row] is a non zero row, returns False otherwise
+        
+        is_non_zero_row: Matrix, Nat -> Bool
+        '''
         i = 0
         for n in self.val[row]:
             if n != 0:
@@ -142,6 +201,11 @@ class Matrix:
         return False
     
     def is_RREF(self):
+        '''
+        returns True if self is in RREF form, returns False otherwise
+        
+        is_RREF: Fraction -> Bool
+        '''
         prev_leading_one_index = -1
         #check zero row
         for i in range(self.row):
