@@ -230,18 +230,43 @@ class Matrix:
         return True
     
     def row_mult(self, row_num, mult):
+        '''
+        multiplies row row_num by mult
+        
+        row_mult: Matrix Nat (anyof Fraction Int Float) -> None
+        requires: 0 <= row_num < self.row
+        '''
         self.val[row_num] = list(map(lambda x: x * mult, self.val[row_num]))
     
     def row_swap(self, row_num_1, row_num_2):
+        '''
+        swaps row row_num_1 with row row_num_2
+        
+        row_swap: Matrix Nat Nat -> None
+        requires: 0 <= row_num_1 < self.row
+                  0 <= row_num_2 < self.row
+        '''
         for i in range(self.col):
             self.val[row_num_1][i], self.val[row_num_2][i] =\
             self.val[row_num_2][i], self.val[row_num_1][i]
     
     def row_add_mult(self, row_num_1, row_num_2, mult):
+        '''
+        row row_num_1 adds mult * row row_num_2
+        
+        row_add_mult: Matrix Nat Nat (anyof Fraction Int Float) -> None
+        requires: 0 <= row_num_1 < self.row
+                  0 <= row_num_2 < self.row
+        '''
         for i in range(self.col):
             self.val[row_num_1][i] += self.val[row_num_2][i] * mult
                     
     def row_reduce(self, n):
+        '''
+        row reduces the submatrix whose up-left value is self.val[n][n]
+        
+        row_reduce: Matrix Nat -> None
+        '''
         #if first is zero, find a non-zero row
         have_non_zero_row = False
         for i in range(n, self.row):
@@ -265,15 +290,30 @@ class Matrix:
             self.row_add_mult(n, i, -self.val[n][i])
             
     def rearrange_leading_one(self):
+        '''
+        rearrages each row by the index of its leading 1
+        
+        rearrange_leading_one: Matrix -> None
+        '''
         self.val.sort(key = lambda x: leading_one_index(x))
             
     def RREF(self):
+        '''
+        returns the RREF of self
+        
+        RREF: Matrix -> Matrix
+        '''
         m = self.deep_copy()
         m.row_reduce(0)
         m.rearrange_leading_one()
         return m
     
     def rank(self):
+        '''
+        returns the rank of self
+        
+        rank: Matrix -> Nat
+        '''
         RREF = self.RREF()
         r = 0
         for i in range(RREF.row):
@@ -284,9 +324,19 @@ class Matrix:
         return r
     
     def invertible(self):
+        '''
+        returns true if self is invertible
+        
+        invertible: Matrix -> Bool
+        '''
         return self.row == self.col == self.rank()
     
     def inverse(self):
+        '''
+        returns the inverse Matrix of self
+        
+        inverse: Matrix -> Matrix
+        '''
         if not self.invertible():
             return "undefined"
         aug_self = Aug_Matrix(self.row, self.col, self.row,
